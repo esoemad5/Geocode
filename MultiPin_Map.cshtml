@@ -1,0 +1,117 @@
+﻿@model IEnumerable<AnhMaps.Models.Venue>
+
+@{
+    ViewData["Title"] = "Map";
+}
+
+<h2>Map</h2>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+                    @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
+                    @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+
+
+<style>
+    #map {
+        height: 900px;
+        width: 100%;
+    }
+</style>
+<div id="map"></div>
+<script>
+
+
+    function initMap() {
+        var location = {
+            lat: 33.799700,
+            lng: -117.920190
+        }
+
+
+        var options = {
+            zoom: 13,
+            center: location
+        }
+
+        var map = new google.maps.Map(document.getElementById('map'), options);
+
+        createMarkers(map);
+
+        //var marker = new google.maps.Marker({
+        //    position: location,
+        //    map: map
+        //});
+
+        //var infoWindow = new google.maps.InfoWindow({
+        //    content: 'test'
+        //});
+
+        //marker.addListener('click', function () {
+        //    infoWindow.open(map, marker);
+        //});
+        //var marker = new google.maps.Marker({
+        //    position: location2,
+        //    map: map
+        //});
+    }
+
+    function addMarker(latitude, longitude, title, description, map, image) {
+        var latLng = new google.maps.LatLng(latitude, longitude);
+        var contentString = '<h3>' + title + '</h3>' + '<p>' + description + '</p>';
+
+        var infowindow = new google.maps.InfoWindow({
+            content: contentString
+        });
+
+        var marker = new google.maps.Marker({
+            position: latLng,
+            title: title,
+            map: map,
+            draggable: false,
+            icon: image
+        });
+
+        google.maps.event.addListener(marker, 'click', function () {
+            infowindow.open(map, marker);
+        });
+    }
+
+            function createMarkers(map) {
+        @foreach (var item in Model){
+            if (item.isHotel)
+            {
+                @:var image = "https://upload.wikimedia.org/wikipedia/commons/d/d2/UCSD_Shuttle_H_icon.svg";
+            }
+            else if(item.isBar)
+            {
+                @:var image = "https://upload.wikimedia.org/wikipedia/commons/a/a3/Paris_RER_B_icon.svg";
+            }
+            @:addMarker(@item.latitude, @item.longitude, '@item.name', '@item.address', map, image);
+        }
+        }
+</script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=KEY_GOES_HERE&callback=initMap"
+        async defer><</script>
